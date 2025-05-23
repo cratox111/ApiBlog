@@ -2,11 +2,13 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from flask_migrate import Migrate
+from flask_jwt_extended import JWTManager
 import os
 
 load_dotenv()
 migrate = Migrate()
 db = SQLAlchemy()
+jwt = JWTManager()
 
 def create_app():
 
