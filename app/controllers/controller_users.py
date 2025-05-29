@@ -1,7 +1,8 @@
 from flask import jsonify, request
 from app.models.model_user import Users
+from app.models.model_posts import Posts
 from app import db
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
 
 def registerUser():
@@ -49,7 +50,7 @@ def loginUser():
     if not check_password_hash(user.password, password):
         return jsonify({'message': 'incorrect password'}), 401
     
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity={'userid':user.id, 'username':user.name})
 
     return jsonify({
         'message': 'Login successful',
@@ -91,3 +92,25 @@ def DeleteteUser(id):
     db.session.delete(user)
     db.session.commit()
     return jsonify({'message': 'user delete'})
+
+@jwt_required()
+def createPost():
+    input_data = request.get_json()
+    identify = get_jwt_identity()
+
+    user_id = identify['userid']
+    user_create = identify['username']
+    title = input_data.get('title')
+    body = input_data.get('body')
+
+    if not user_create or not title or not body:
+        return jsonify({'message':'data is missing'})
+
+    new_post = Posts(user_create=user_create, title=title, body=body)
+
+    db.session.add(new_post)
+    db.session.commit()
+
+    return jsonify({'message':'create post'})
+
+
