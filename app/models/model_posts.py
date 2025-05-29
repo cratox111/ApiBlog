@@ -10,4 +10,10 @@ class Posts(db.Model):
     public_date = db.Column(db.DateTime)
 
     comments = db.relationship('Comments', backreaf='post', lazy=True)
-    
+
+    def to_dict(self):
+        return {
+            'user_create':self.user_create,
+            'title':self.title,
+            'body':self.body,
+        }
