@@ -80,7 +80,7 @@ def UpdateUser(id):
     user.rol = inputData.get('rol', user.rol)
 
     db.session.commit()
-
+    return jsonify({'message':'user successfully update'})
 
 
 def DeleteteUser(id):
@@ -114,3 +114,37 @@ def createPost():
     return jsonify({'message':'create post'})
 
 
+@jwt_required()
+def updatePost(id):
+    inputData = request.get_json()
+    identify = get_jwt_identity()
+
+    post = Posts.query.get(id)
+
+    if not post:
+        return jsonify({'message':'post does not exist'})
+    
+    if not identify['userid'] == post.user_create:
+        return jsonify({'message':'only the author can modify'})
+    
+    post.title = inputData.get('title', post.title)
+    post.body = inputData.get('title', post.body)
+
+    db.session.commit()
+    return jsonify({'message':'post successfully update'})
+
+@jwt_required()
+def deletePost(id):
+    identify = get_jwt_identity()
+
+    post = Posts.query.get(id)
+
+    if not post:
+        return jsonify({'message':'post does not exist'})
+    
+    if not identify['userid'] == post.user_create:
+        return jsonify({'message':'only the author can modify'})
+    
+    db.session.delete(post)
+    db.session.commit()
+    return jsonify({'message':'post successfully deleted'})
