@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from app.models.model_user import Users
 from app.models.model_posts import Posts
+from app.models.model_comments import Comments
 from app import db
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -128,7 +129,7 @@ def updatePost(id):
         return jsonify({'message':'only the author can modify'})
     
     post.title = inputData.get('title', post.title)
-    post.body = inputData.get('title', post.body)
+    post.body = inputData.get('body', post.body)
 
     db.session.commit()
     return jsonify({'message':'post successfully update'})
@@ -148,3 +149,20 @@ def deletePost(id):
     db.session.delete(post)
     db.session.commit()
     return jsonify({'message':'post successfully deleted'})
+
+@jwt_required()
+def createComment(id):
+    inputData = request.get_json()
+    identify = get_jwt_identity()
+
+    user_create = identify['username']
+    posts = Posts.query.get(id)
+    body = inputData['body']
+
+    new_comment = Comments(user_name=user_create, post=posts, body=body)    
+
+    db.session.add(new_comment)
+    db.session.commit()
+    return jsonify({'message': 'Creado'})
+
+    

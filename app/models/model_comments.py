@@ -5,6 +5,7 @@ class Comments(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.foreign_key('users.id'))
+    user_name = db.Column(db.String(100))
     post_id = db.Column(db.Integer, db.foreign_key('posts.id'))
     body = db.Column(db.Text)
     public_date = db.Column(db.DateTime)
